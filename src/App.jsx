@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Plus, X, List, Calendar, ChevronDown, Save, Send, Loader2, AlertCircle, User, Clock, CheckCircle, FileText, Trash2, Download } from 'lucide-react';
+// FIX: 最終修正：將所有 Firebase 導入路徑改為絕對路徑
 import { initializeApp } from 'firebase/app';
 import {
   getAuth,
