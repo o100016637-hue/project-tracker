@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Plus, X, List, Calendar, ChevronDown, Save, Send, LogOut, AlertCircle, User, Clock, CheckCircle, Loader2, FileText, Trash2, Download } from 'lucide-react';
+import { Plus, X, List, Calendar, ChevronDown, Save, Send, Loader2, AlertCircle, User, Clock, CheckCircle, FileText, Trash2, Download } from 'lucide-react';
 import { initializeApp } from 'firebase/app';
 import {
   getAuth,
@@ -56,6 +56,7 @@ const downloadJson = (data, filename) => {
 // 將時間戳記轉換為易讀的日期時間格式
 const formatDateTime = (timestamp) => {
   if (!timestamp) return '未定';
+  // 處理 Firestore Timestamp 或 JS Date
   const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
   return date.toLocaleDateString('zh-TW', {
     year: 'numeric',
@@ -71,6 +72,7 @@ const formatDateTime = (timestamp) => {
 const formatDateToInput = (timestamp) => {
   if (!timestamp) return '';
   const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+  // 安全性檢查
   if (isNaN(date.getTime())) return ''; 
   return date.toISOString().split('T')[0];
 };
@@ -229,9 +231,6 @@ const NoteEditor = ({ projectId, currentNote, noteKey, label, user }) => {
         timestamp: serverTimestamp(),
       });
       
-      // 更新成功後重置狀態 (如果需要)
-      // setNote(note);
-
     } catch (err) {
       console.error(`提交 ${label} 錯誤:`, err);
       setError(`提交失敗: ${err.message}`);
@@ -363,7 +362,8 @@ const ProjectReportSection = ({ projectId, user }) => {
       setReportText('');
     } catch (err) {
       console.error('發送回報失敗:', err);
-      alert('發送回報失敗，請檢查網路。'); // 使用 Toast/Modal 代替 alert
+      // 使用 Toast/Modal 代替 alert
+      alert('發送回報失敗，請檢查網路。'); 
     } finally {
       setIsSending(false);
     }
@@ -575,7 +575,7 @@ const AddProjectModal = ({ isOpen, onClose, user }) => {
 
 
 // --- 專案詳情與週期轉換模態框 (ProjectDetailModal) ---
-const ProjectDetailModal = ({ isOpen, onClose, project, user, onUpdateProject, projectReports }) => {
+const ProjectDetailModal = ({ isOpen, onClose, project, user, onUpdateProject }) => {
   const [draft, setDraft] = useState({
     plannedActivity: project?.nextActivity || '',
     plannedStart: formatDateToInput(project?.nextStart || new Date()), // 使用新的nextStart或當前日期
@@ -1106,7 +1106,7 @@ function ProjectTrackerApp() {
                 project={project}
                 onOpenDetail={setSelectedProject}
                 onOpenHistory={setSelectedProjectIdForHistory}
-                onFinalClose={handleFinalClose} // 傳遞最終結案函數
+                onFinalClose={handleFinalClose}
                 user={user}
               />
             ))}
